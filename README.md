@@ -1,3 +1,3 @@
 Hi everyone!
-This is the our project of flapp bird game.
+This is the our project of flappy bird game.
 
