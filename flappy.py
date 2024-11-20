@@ -1,11 +1,20 @@
 import pygame
 import sys
+import random
 
 # Prepare the Pygame components for launching our game
 pygame.init()
 
+SCREEN_WIDTH = 1500
+SCREEN_HEIGHT = 750
+BIRD_HEIGHT = 40
+BIRD_WIDTH = 40
+BIRD_COLOR = (255, 0, 0)
+PIPE_GAP = 200  #contant gap between the upper and the lower pipe
+SCREEN_BG = (255, 255, 255)
+
 # Create a game window of size 1500x750 pixels
-screen = pygame.display.set_mode((1500, 750))
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Set the title of the game window as 'Flappy Bird'
 pygame.display.set_caption("Flappy Bird")
@@ -19,10 +28,10 @@ class Bird:
     def __init__(self, a, b, width, height):
 
         # Bird's position and size (a, b, width, height)
-        self.x = a
-        self.y = b
-        self.width = width
-        self.height = height
+        self.x = 200
+        self.y = SCREEN_HEIGHT / 2
+        self.width = BIRD_WIDTH
+        self.height = BIRD_HEIGHT
 
         # # The bird velocity (origin) is 0 (it starts stopped)
         self.velocity = 0  
@@ -31,10 +40,20 @@ class Bird:
         self.gravity = 0.5  
         
         # Bird will jump up if the spacebar is pressed
-        self.jump_strength = -10  
+        self.jump_strength = -7  
         
         # Bird's colour
-        self.color = (255, 0, 0)  
+        self.color = (BIRD_COLOR)
+
+    def jump(self):
+        
+        # Set the bird's velocity to the jump strength when the spacebar is pressed
+        self.velocity = self.jump_strength  # Propel upwards
+
+    def draw(self, screen):
+        
+        # Render the bird as a red rectangle at its current position
+        pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
     
     def update(self):
        
@@ -58,36 +77,47 @@ class Bird:
             
             self.velocity = 0  # Halt downward movement
 
-    def jump(self):
-        
-        # Set the bird's velocity to the jump strength when the spacebar is pressed
-        self.velocity = self.jump_strength  # Propel upwards
 
-    def draw(self, screen):
-        
-        # Render the bird as a red rectangle at its current position
-        pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height))
+#--------------------------Pipe class starting--------------------------------
+class Pipe:
+    def __init__(self):
+        self.x = SCREEN_WIDTH
+        self.height = random.randint(100, SCREEN_HEIGHT - PIPE_GAP - 100)
+        self.top = self.height
+        self.bottom = self.height + PIPE_GAP
+        self.velocity = 5
+        self.color = (0, 255, 0)  # Green color for pipes
 
-# Define dimensions for the game screen and the bird
-screen_width = 800
-screen_height = 600
-bird_width = 40
-bird_height = 40
+    def draw(self):
+        pygame.draw.rect(screen, self.color, (self.x, 0, 50, self.top))  #upper pipes
+        pygame.draw.rect(screen, self.color, (self.x, self.bottom, 50, SCREEN_HEIGHT - self.bottom)) #Bottom pipes
+
+    def movement(self):
+        self.x -= self.velocity
+
+    def update(self):
+        self.x -= self.velocity
+
+#-------------------pipe class ending------------------------
+    
+
 
 # Position the bird centrally on the screen (vertically)
 
 bird_x = 100  # The bird starts 100 pixels from the left
 
-bird_y = screen_height // 2 - bird_height // 2  # Center the bird vertically
+bird_y = SCREEN_HEIGHT // 2 - BIRD_HEIGHT // 2  # Center the bird vertically
 
 # Instantiate a bird object with the defined position and size
-bird = Bird(bird_x, bird_y, bird_width, bird_height)
+bird = Bird(bird_x, bird_y, BIRD_WIDTH, BIRD_HEIGHT)
+
+pipes = [Pipe()] 
 
 # Begin the main game loop
 while True:
     
     # Clear the screen with a white background for each frame
-    screen.fill((255, 255, 255))
+    screen.fill((SCREEN_BG))
 
     # Process events (like key presses and closing the window)
     for event in pygame.event.get():
@@ -107,15 +137,30 @@ while True:
                 
                 bird.jump()  # Invoke the bird's jump method 
 
+
+
+
     # Update the bird's position according to gravity and jumping 
     bird.update()
 
     # Display the bird on the screen
     bird.draw(screen)
 
+
+    #This loop is for pipes updation
+    for pipe in pipes:
+        pipe.update() 
+        pipe.draw() #This called function generate the pipes in loop
+
+    #This will appear new pipes on the screen
+    if len(pipes) > 0:  #if there is at least one pipe on the screen
+        last_pipe = pipes[-1]
+        if last_pipe.x < SCREEN_WIDTH - 300:  # Add new pipe when space is available
+            pipes.append(Pipe())
+
+
     # Refresh the game display to reflect the updated screen
     pygame.display.update()
 
     # Frame rate to 60fps
     clock.tick(60)
-
