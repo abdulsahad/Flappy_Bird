@@ -2,9 +2,8 @@ import pygame
 import sys
 import random
 
-# Pygame library intialization
 pygame.init()
-# This is the screen dimensions and constants
+# This is the window dimensions and constants
 WIND_WIDTH = 1500
 WIND_HEIGHT = 760
 BIRD_HEIGHT = 40
@@ -13,15 +12,15 @@ BIRD_COLOR = (250, 0, 0)
 GAP_BETWEEN_PIPES = 220 # Gap between the top and bottom pipes
 SCREEN_BGD = (255, 255, 255) # background color 
 
-# Game window set up
+# Game window setting up
 screen = pygame.display.set_mode((WIND_WIDTH, WIND_HEIGHT))
 pygame.display.set_caption("Flappy Bird")
 clock = pygame.time.Clock()
 
-# The Bird's class (defining its properties and behavior)
+# This is the Bird class (defining bird properties and behavior)
 class Bird:
     def __init__(self, a, b, width, height):
-        # Bird's position, size, and movement
+        # Bird position, size, and movement
         self.x = a  # Horizontal Position
         self.y = b  # Vertical Position
         self.width = width  # Width of the bird
@@ -34,10 +33,12 @@ class Bird:
     def jump(self):
         # Trigger the bird to jump by applying an upward velocity
         self.velocity = self.jump_strength
-
+        
+    #This function draws the bird on screen
     def draw(self, screen):
         pygame.draw.rect(screen, self.c, (self.x, self.y, self.width, self.height))
 
+    #This fucntion updates every new changes commited by the user
     def update(self):
         self.velocity += self.gravity
         self.y += self.velocity
